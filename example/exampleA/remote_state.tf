@@ -1,6 +1,6 @@
 terraform {
   # fix the provider version
-  required_version = "0.12.8"
+  required_version = "~> 0.12.0"
 
   #add role_arn to use assumed roles to access the bucket
 
