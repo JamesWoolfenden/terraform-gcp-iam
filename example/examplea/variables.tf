@@ -31,4 +31,3 @@ variable "osadminlogins" {
 variable "serviceAccountUsers" {
   type = list
 }
-
