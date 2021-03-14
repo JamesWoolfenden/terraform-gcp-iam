@@ -9,25 +9,25 @@ variable "region" {
 }
 
 variable "browsers" {
-  type = list
+  type = list(any)
 }
 
 variable "viewers" {
-  type = list
+  type = list(any)
 }
 
 variable "storageadmins" {
-  type = list
+  type = list(any)
 }
 
 variable "oslogins" {
-  type = list
+  type = list(any)
 }
 
 variable "osadminlogins" {
-  type = list
+  type = list(any)
 }
 
 variable "serviceAccountUsers" {
-  type = list
+  type = list(any)
 }

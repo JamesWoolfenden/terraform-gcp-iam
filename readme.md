@@ -16,18 +16,29 @@ No requirements.
 |------|---------|
 | google | n/a |
 
+## Modules
+
+No Modules.
+
+## Resources
+
+| Name |
+|------|
+| [google_iam_role](https://registry.terraform.io/providers/hashicorp/google/latest/docs/data-sources/iam_role) |
+| [google_project_iam_binding](https://registry.terraform.io/providers/hashicorp/google/latest/docs/resources/project_iam_binding) |
+
 ## Inputs
 
 | Name | Description | Type | Default | Required |
 |------|-------------|------|---------|:--------:|
-| browsers | n/a | `list` | n/a | yes |
-| osadminlogins | n/a | `list` | n/a | yes |
-| oslogins | n/a | `list` | n/a | yes |
+| browsers | n/a | `list(any)` | n/a | yes |
+| osadminlogins | n/a | `list(any)` | n/a | yes |
+| oslogins | n/a | `list(any)` | n/a | yes |
 | project | The GCP project to run against | `string` | n/a | yes |
 | region | GCP region | `string` | n/a | yes |
-| serviceAccountUsers | n/a | `list` | n/a | yes |
-| storageadmins | n/a | `list` | n/a | yes |
-| viewers | n/a | `list` | n/a | yes |
+| serviceAccountUsers | n/a | `list(any)` | n/a | yes |
+| storageadmins | n/a | `list(any)` | n/a | yes |
+| viewers | n/a | `list(any)` | n/a | yes |
 
 ## Outputs
 
@@ -36,5 +47,4 @@ No requirements.
 | included\_permissions | n/a |
 | stage | n/a |
 | title | n/a |
-
 <!-- END OF PRE-COMMIT-TERRAFORM DOCS HOOK -->
