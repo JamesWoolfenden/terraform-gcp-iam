@@ -24,34 +24,24 @@ No modules.
 
 | Name | Type |
 |------|------|
-| [google_project_iam_binding.Compute-OS-Admin-Login](https://registry.terraform.io/providers/hashicorp/google/latest/docs/resources/project_iam_binding) | resource |
-| [google_project_iam_binding.Compute-OS-Login](https://registry.terraform.io/providers/hashicorp/google/latest/docs/resources/project_iam_binding) | resource |
-| [google_project_iam_binding.browser](https://registry.terraform.io/providers/hashicorp/google/latest/docs/resources/project_iam_binding) | resource |
-| [google_project_iam_binding.serviceAccountUsers](https://registry.terraform.io/providers/hashicorp/google/latest/docs/resources/project_iam_binding) | resource |
-| [google_project_iam_binding.storageadmin](https://registry.terraform.io/providers/hashicorp/google/latest/docs/resources/project_iam_binding) | resource |
-| [google_project_iam_binding.viewer](https://registry.terraform.io/providers/hashicorp/google/latest/docs/resources/project_iam_binding) | resource |
-| [google_iam_role.roleinfo](https://registry.terraform.io/providers/hashicorp/google/latest/docs/data-sources/iam_role) | data source |
+| [google_compute_firewall.default](https://registry.terraform.io/providers/hashicorp/google/latest/docs/resources/compute_firewall) | resource |
+| [google_compute_firewall.healthcheck](https://registry.terraform.io/providers/hashicorp/google/latest/docs/resources/compute_firewall) | resource |
+| [google_compute_instance_template.europe-west1-template](https://registry.terraform.io/providers/hashicorp/google/latest/docs/resources/compute_instance_template) | resource |
+| [google_compute_instance_template.us-east1-template](https://registry.terraform.io/providers/hashicorp/google/latest/docs/resources/compute_instance_template) | resource |
+| [google_compute_region_instance_group_manager.us-east](https://registry.terraform.io/providers/hashicorp/google/latest/docs/resources/compute_region_instance_group_manager) | resource |
+| [google_compute_image.debian](https://registry.terraform.io/providers/hashicorp/google/latest/docs/data-sources/compute_image) | data source |
 
 ## Inputs
 
 | Name | Description | Type | Default | Required |
 |------|-------------|------|---------|:--------:|
-| <a name="input_browsers"></a> [browsers](#input\_browsers) | n/a | `list(any)` | n/a | yes |
-| <a name="input_osadminlogins"></a> [osadminlogins](#input\_osadminlogins) | n/a | `list(any)` | n/a | yes |
-| <a name="input_oslogins"></a> [oslogins](#input\_oslogins) | n/a | `list(any)` | n/a | yes |
-| <a name="input_project"></a> [project](#input\_project) | The GCP project to run against | `string` | n/a | yes |
-| <a name="input_region"></a> [region](#input\_region) | GCP region | `string` | n/a | yes |
-| <a name="input_serviceAccountUsers"></a> [serviceAccountUsers](#input\_serviceAccountUsers) | n/a | `list(any)` | n/a | yes |
-| <a name="input_storageadmins"></a> [storageadmins](#input\_storageadmins) | n/a | `list(any)` | n/a | yes |
-| <a name="input_viewers"></a> [viewers](#input\_viewers) | n/a | `list(any)` | n/a | yes |
+| <a name="input_common_tags"></a> [common\_tags](#input\_common\_tags) | This is to help you add tags to your cloud objects | `map(any)` | n/a | yes |
+| <a name="input_network"></a> [network](#input\_network) | n/a | `any` | n/a | yes |
+| <a name="input_project"></a> [project](#input\_project) | n/a | `string` | n/a | yes |
 
 ## Outputs
 
-| Name | Description |
-|------|-------------|
-| <a name="output_included_permissions"></a> [included\_permissions](#output\_included\_permissions) | n/a |
-| <a name="output_stage"></a> [stage](#output\_stage) | n/a |
-| <a name="output_title"></a> [title](#output\_title) | n/a |
+No outputs.
 <!-- END OF PRE-COMMIT-TERRAFORM DOCS HOOK -->
 
 ## Related Projects
@@ -64,17 +54,17 @@ Check out these related projects.
 
 **Got a question?**
 
-File a GitHub [issue](https://github.com/JamesWoolfenden/terraform-gcp-http-internal/issues).
+File a GitHub [issue](https://github.com/JamesWoolfenden/terraform-gcp-iam/issues).
 
 ## Contributing
 
 ### Bug Reports & Feature Requests
 
-Please use the [issue tracker](https://github.com/JamesWoolfenden/terraform-gcp-http-internal/issues) to report any bugs or file feature requests.
+Please use the [issue tracker](https://github.com/JamesWoolfenden/terraform-gcp-iam/issues) to report any bugs or file feature requests.
 
 ## Copyrights
 
-Copyright © 2021 James Woolfenden
+Copyright Â© 2021 James Woolfenden
 
 ## License
 
@@ -108,8 +98,8 @@ under the License.
 [github]: https://github.com/jameswoolfenden
 [linkedin]: https://www.linkedin.com/in/jameswoolfenden/
 [twitter]: https://twitter.com/JimWoolfenden
-[share_twitter]: https://twitter.com/intent/tweet/?text=terraform-gcp-http-internal&url=https://github.com/JamesWoolfenden/terraform-gcp-http-internal
-[share_linkedin]: https://www.linkedin.com/shareArticle?mini=true&title=terraform-gcp-http-internal&url=https://github.com/JamesWoolfenden/terraform-gcp-http-internal
-[share_reddit]: https://reddit.com/submit/?url=https://github.com/JamesWoolfenden/terraform-gcp-http-internal
-[share_facebook]: https://facebook.com/sharer/sharer.php?u=https://github.com/JamesWoolfenden/terraform-gcp-http-internal
-[share_email]: mailto:?subject=terraform-gcp-http-internal&body=https://github.com/JamesWoolfenden/terraform-gcp-http-internal
+[share_twitter]: https://twitter.com/intent/tweet/?text=terraform-gcp-iam&url=https://github.com/JamesWoolfenden/terraform-gcp-iam
+[share_linkedin]: https://www.linkedin.com/shareArticle?mini=true&title=terraform-gcp-iam&url=https://github.com/JamesWoolfenden/terraform-gcp-iam
+[share_reddit]: https://reddit.com/submit/?url=https://github.com/JamesWoolfenden/terraform-gcp-iam
+[share_facebook]: https://facebook.com/sharer/sharer.php?u=https://github.com/JamesWoolfenden/terraform-gcp-iam
+[share_email]: mailto:?subject=terraform-gcp-iam&body=https://github.com/JamesWoolfenden/terraform-gcp-iam
