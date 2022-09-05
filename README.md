@@ -14,7 +14,7 @@ No requirements.
 
 | Name | Version |
 |------|---------|
-| <a name="provider_google"></a> [google](#provider\_google) | n/a |
+| <a name="provider_google"></a> [google](#provider\_google) | 4.34.0 |
 
 ## Modules
 
@@ -53,6 +53,26 @@ No modules.
 | <a name="output_stage"></a> [stage](#output\_stage) | n/a |
 | <a name="output_title"></a> [title](#output\_title) | n/a |
 <!-- END OF PRE-COMMIT-TERRAFORM DOCS HOOK -->
+
+## Role and Permissions
+
+<!-- BEGINNING OF PRE-COMMIT-PIKE DOCS HOOK -->
+The Terraform resource required is:
+
+```golang
+resource "google_project_iam_custom_role" "terraformXVlBzgba" {
+  project     = "examplea"
+  role_id     = "terraform_pike"
+  title       = "terraformXVlBzgba"
+  description = "A user with least privileges"
+  permissions = [
+    "resourcemanager.projects.getIamPolicy",
+    "resourcemanager.projects.setIamPolicy"
+  ]
+}
+
+```
+<!-- END OF PRE-COMMIT-PIKE DOCS HOOK -->
 
 ## Related Projects
 
@@ -105,11 +125,3 @@ under the License.
 
 [jameswoolfenden_homepage]: https://github.com/jameswoolfenden
 [jameswoolfenden_avatar]: https://github.com/jameswoolfenden.png?size=150
-[github]: https://github.com/jameswoolfenden
-[linkedin]: https://www.linkedin.com/in/jameswoolfenden/
-[twitter]: https://twitter.com/JimWoolfenden
-[share_twitter]: https://twitter.com/intent/tweet/?text=terraform-gcp-iam&url=https://github.com/JamesWoolfenden/terraform-gcp-iam
-[share_linkedin]: https://www.linkedin.com/shareArticle?mini=true&title=terraform-gcp-iam&url=https://github.com/JamesWoolfenden/terraform-gcp-iam
-[share_reddit]: https://reddit.com/submit/?url=https://github.com/JamesWoolfenden/terraform-gcp-iam
-[share_facebook]: https://facebook.com/sharer/sharer.php?u=https://github.com/JamesWoolfenden/terraform-gcp-iam
-[share_email]: mailto:?subject=terraform-gcp-iam&body=https://github.com/JamesWoolfenden/terraform-gcp-iam
