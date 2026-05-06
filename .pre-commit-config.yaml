@@ -1,4 +1,4 @@
----
+﻿---
 # yamllint disable rule:line-length
 default_language_version:
   python: python3.11
@@ -32,7 +32,7 @@ repos:
     hooks:
       - id: markdownlint
   - repo: https://github.com/jameswoolfenden/pre-commit
-    rev: e022e4ac6ed682e95d1e813ee62d4fece371014b # v0.1.53
+    rev: 4997cf8b63896568143d5c6e820741214bc9f314 # v0.1.61
     hooks:
       - id: terraform-fmt
         language_version: python3.11
@@ -46,12 +46,16 @@ repos:
         verbose: true
         entry: checkov -d example/examplea --external-checks-dir checkov --download-external-modules true --compact
   - repo: https://github.com/jameswoolfenden/pike
-    rev: d043242b9e1733e9e5a67c20bb87c05a4d563596 # v0.4.1
+    rev: 4b5670a3254572b7853ebeb4c66718f2e6e09c51 # v0.4.3
     hooks:
       - id: pike-docs-go
         args: ["readme","-d", ".", "-i"]
+  - repo: 'https://github.com/rhysd/actionlint'
+    rev: 914e7df21a07ef503a81201c76d2b11c789d3fca
+    hooks:
+      - id: actionlint
   - repo: https://github.com/jameswoolfenden/ghat
-    rev: 9ac03a27b221b0173a40e66aac1d09f5be4db40c # v0.1.23
+    rev: a386050ae690ce55f567aaf177fa0516427f014a # v0.1.28
     hooks:
       - id: ghat-go
-        args: ["swot","-d", "."]
+      - id: ghat-go-sift
