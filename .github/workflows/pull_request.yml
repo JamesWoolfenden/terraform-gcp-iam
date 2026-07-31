@@ -13,6 +13,7 @@ concurrency:
   cancel-in-progress: true
 
 jobs:
+  # holden:ignore:HLD_CI_017: JamesWoolfenden/.github is self-owned — tracking @main is by design so this repo picks up reusable-workflow changes automatically
   pr:
     uses: JamesWoolfenden/.github/.github/workflows/terraform-pr-gcp.yml@main
     with:

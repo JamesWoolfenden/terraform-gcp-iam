@@ -1,0 +1,82 @@
+{
+  "findings": [
+    {
+      "confidence": "medium",
+      "explanation": "roles/compute.osAdminLogin is bound at the project level with no `condition` block, so every member in var.osadminlogins gets root-equivalent SSH (sudo) access via OS Login to every Compute Engine instance in the project that has OS Login enabled \u2014 not just an intended subset. The sibling binding for roles/compute.osLogin (standard, non-sudo SSH) has the same project-wide scope. No holden rule currently checks for a missing IAM Condition on these two roles (HLD_GCP_204's high-risk-admin-role check and HLD_GCP_044's primitive-role check don't cover compute.osAdminLogin/osLogin), so the deterministic engine is silent here even though the blast radius of a compromised or over-broadly-populated member list is the entire compute fleet.",
+      "file": "google_project_iam_binding.compute_os_admin_login.tf",
+      "first_seen": "2026-07-31",
+      "fixable": false,
+      "fixed_note": "Added optional osadminlogin_condition/oslogin_condition variables (object, default null) and dynamic \"condition\" blocks on both google_project_iam_binding resources, so callers can scope the grant with an IAM condition. Non-breaking: default null produces no condition block, identical to prior behavior. Verified via terraform validate, a no-op plan diff on the example module, and a clean holden rescan (HLD_GCP_449 no longer fires; only the 2 pre-existing HLD_CI_017 findings remain).",
+      "id": "HOLDEN_AI_001",
+      "last_seen": "2026-07-31",
+      "line": 1,
+      "principle": "identity-and-access",
+      "related_resources": [
+        "google_project_iam_binding.compute_os_login"
+      ],
+      "remediation": "If the intent is genuinely project-wide OS Login admin access, keep as-is but document that decision. Otherwise add an optional `condition` block (e.g. scoping by `resource.name.startsWith(\"projects/_/instances/<prefix>-\")` or a tag-based CEL expression) so the grant applies only to the instances that need it, reducing blast radius if the member list is later widened.",
+      "resource": "google_project_iam_binding.compute_os_admin_login",
+      "severity": "HIGH",
+      "status": "fixed",
+      "suppression_reason": null,
+      "title": "Project-wide compute.osAdminLogin / compute.osLogin grants have no IAM Condition scoping"
+    },
+    {
+      "confidence": "high",
+      "explanation": "This repo suppresses 5 deterministic findings across its files. Three carry an explicit reason after the policy ID (provider.google.tf: HLD_GCP_059 'per-repo WIF SA with attribute_condition scoping...'; google_project_iam_binding.viewer.tf: HLD_GCP_044 'roles/viewer is intentional here'; module.iam.tf: HLD_TF_026 'examples intentionally use ../../...'). Two do not: `# holden:ignore:HLD_GCP_204` in google_project_iam_binding.storageadmin.tf:1 (a HIGH-severity 'high-risk cross-service admin role at project level' check) and `# holden:ignore:HLD_TF_004` in example/examplea/terraform.tf:1 (a HIGH-severity 'remote backend must be configured' check). A rules engine can only verify the suppression syntax is well-formed; it can't tell that the repo's own established convention is to document *why*, and that these two break that pattern. Without a reason, a future reviewer (or the original author in six months) can't tell whether these were deliberate, forgotten placeholders, or copy-paste leftovers.",
+      "file": "google_project_iam_binding.storageadmin.tf",
+      "first_seen": "2026-07-31",
+      "fixable": false,
+      "fixed_note": "Added reasons to both suppression comments per user-confirmed rationale: HLD_GCP_204 \u2014 'storage.admin is the intended scope for this binding \u2014 module callers control membership via var.storageadmins'; HLD_TF_004 \u2014 'example module has no state of its own, backend intentionally omitted'. Verified via holden rescan: same 2 pre-existing HLD_CI_017 findings, both suppressions still hold.",
+      "id": "HOLDEN_AI_002",
+      "last_seen": "2026-07-31",
+      "line": 1,
+      "principle": "governance",
+      "related_resources": [
+        "example/examplea/terraform.tf"
+      ],
+      "remediation": "Add a reason to each suppression matching the repo's existing convention, e.g. `# holden:ignore:HLD_GCP_204: storage.admin is the intended scope for this binding \u2014 module callers control membership via var.storageadmins` and `# holden:ignore:HLD_TF_004: example module has no state of its own, backend intentionally omitted`. Use the actual reasoning behind each decision rather than these placeholders.",
+      "resource": "google_project_iam_binding.storageadmin",
+      "severity": "MEDIUM",
+      "status": "fixed",
+      "suppression_reason": null,
+      "title": "Two of five `holden:ignore` suppressions in this repo carry no justification, unlike the others"
+    },
+    {
+      "confidence": "medium",
+      "explanation": "Five separate .tf files each define a `google_project_iam_binding` with the identical three-line shape (`project = var.project`, a single hardcoded `role`, `members = var.<role>s`) differing only in the role string and the backing variable. This is exactly the case a `for_each` over a `{ role => members }` map would collapse into one resource block \u2014 adding a sixth role today means copy-pasting a sixth file rather than adding one map entry. The deterministic engine scores each file's internal complexity but has no cross-file similarity pass, so it can't see the duplication.",
+      "file": "google_project_iam_binding.browser.tf",
+      "first_seen": "2026-07-31",
+      "fixable": false,
+      "id": "HOLDEN_AI_003",
+      "last_seen": "2026-07-31",
+      "line": 1,
+      "principle": "maintainability",
+      "related_resources": [
+        "google_project_iam_binding.compute_os_admin_login",
+        "google_project_iam_binding.compute_os_login",
+        "google_project_iam_binding.storageadmin",
+        "google_project_iam_binding.viewer"
+      ],
+      "remediation": "Consider replacing the five files with a single `google_project_iam_binding` resource using `for_each` over a local map, e.g. `for_each = { browser = var.browsers, viewer = var.viewers, \"storage.admin\" = var.storageadmins, \"compute.osAdminLogin\" = var.osadminlogins, \"compute.osLogin\" = var.oslogins }`, with `role = \"roles/${each.key}\"` and `members = each.value`. Only worth doing if the module expects to keep growing the number of roles \u2014 leave as-is if five is the stable set.",
+      "resource": "google_project_iam_binding.browser",
+      "severity": "LOW",
+      "status": "suppressed",
+      "suppression_reason": "User decision: 5 is a stable, small set of roles; separate files are easier to scan/grep/git-blame individually. Also, the per-role IAM condition variables (osadminlogin_condition/oslogin_condition) added for HOLDEN_AI_001 don't generalize cleanly into a single for_each map \u2014 each role would need its own optional condition, which is awkward as a map value. Accepted as-is.",
+      "title": "Five near-identical single-role `google_project_iam_binding` blocks could collapse into one `for_each`"
+    }
+  ],
+  "scan_date": "2026-07-31T00:00:00Z",
+  "scan_path": ".",
+  "suggested_policies": [
+    {
+      "rationale": "Project-level IAM bindings for roles/compute.osAdminLogin and roles/compute.osLogin grant OS-Login SSH access (osAdminLogin includes sudo/root-equivalent privileges) to every Compute Engine instance in the project that has OS Login enabled, not a scoped subset. Neither of holden's existing project-level-role checks (HLD_GCP_204 high-risk cross-service admin roles, HLD_GCP_044 primitive roles) covers these two roles. An IAM Condition scoping the binding to specific instances/tags is the standard mitigation and is directly checkable: does the binding have a `condition` block at all.",
+      "status": "merged_to_fork_pending_upstream_pr",
+      "upstream_branch": "JamesWoolfenden/holden@main (commit 4831918)",
+      "upstream_pr_note": "paloaltonetworks/holden API access is blocked by org SAML SSO enforcement on this token; user will open the PR from JamesWoolfenden/holden main to paloaltonetworks/holden main manually on a connected machine.",
+      "upstream_pr_url": null,
+      "yaml": "id: HLD_GCP_449\nname: Project-level compute OS Login admin/login roles should be scoped with an IAM condition\nprinciple: identity-and-access\nseverity: HIGH\nrationale: |\n  Granting roles/compute.osAdminLogin or roles/compute.osLogin in a project-level\n  IAM binding or member gives every listed principal SSH access to every Compute\n  Engine instance in the project that has OS Login enabled, not just an intended\n  subset. For roles/compute.osAdminLogin this includes sudo/root-equivalent\n  privileges. Without an IAM Condition scoping the grant to specific instances or\n  resource tags, the blast radius of a compromised or over-broadly-populated\n  principal spans the entire compute fleet rather than the instances that\n  actually need it.\nremediation: |\n  Add a `condition` block to the grant, scoping it to specific instances or tags,\n  or restructure the grant so it only targets the intended instances.\nresources:\n  google_project_iam_binding:\n    all:\n      - if_equals:\n          path: role\n          value: roles/compute.osAdminLogin\n          then:\n            path: condition\n            not_null: true\n      - if_equals:\n          path: role\n          value: roles/compute.osLogin\n          then:\n            path: condition\n            not_null: true\n  google_project_iam_member:\n    all:\n      - if_equals:\n          path: role\n          value: roles/compute.osAdminLogin\n          then:\n            path: condition\n            not_null: true\n      - if_equals:\n          path: role\n          value: roles/compute.osLogin\n          then:\n            path: condition\n            not_null: true\n"
+    }
+  ],
+  "suggested_suppressions": []
+}

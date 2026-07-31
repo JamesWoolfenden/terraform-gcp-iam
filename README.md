@@ -24,34 +24,37 @@ No modules.
 
 | Name | Type |
 | ---- | ---- |
-| [google_project_iam_binding.Compute-OS-Admin-Login](https://registry.terraform.io/providers/hashicorp/google/latest/docs/resources/project_iam_binding) | resource |
-| [google_project_iam_binding.Compute-OS-Login](https://registry.terraform.io/providers/hashicorp/google/latest/docs/resources/project_iam_binding) | resource |
 | [google_project_iam_binding.browser](https://registry.terraform.io/providers/hashicorp/google/latest/docs/resources/project_iam_binding) | resource |
-| [google_project_iam_binding.serviceAccountUsers](https://registry.terraform.io/providers/hashicorp/google/latest/docs/resources/project_iam_binding) | resource |
-| [google_project_iam_binding.storageadmin](https://registry.terraform.io/providers/hashicorp/google/latest/docs/resources/project_iam_binding) | resource |
+| [google_project_iam_binding.compute_os_admin_login](https://registry.terraform.io/providers/hashicorp/google/latest/docs/resources/project_iam_binding) | resource |
+| [google_project_iam_binding.compute_os_login](https://registry.terraform.io/providers/hashicorp/google/latest/docs/resources/project_iam_binding) | resource |
+| [google_project_iam_binding.storage_admin](https://registry.terraform.io/providers/hashicorp/google/latest/docs/resources/project_iam_binding) | resource |
 | [google_project_iam_binding.viewer](https://registry.terraform.io/providers/hashicorp/google/latest/docs/resources/project_iam_binding) | resource |
+| [google_service_account.service_account_users](https://registry.terraform.io/providers/hashicorp/google/latest/docs/resources/service_account) | resource |
+| [google_service_account_iam_binding.service_account_users](https://registry.terraform.io/providers/hashicorp/google/latest/docs/resources/service_account_iam_binding) | resource |
 | [google_iam_role.roleinfo](https://registry.terraform.io/providers/hashicorp/google/latest/docs/data-sources/iam_role) | data source |
 
 ## Inputs
 
 | Name | Description | Type | Default | Required |
 | ---- | ----------- | ---- | ------- | :------: |
-| <a name="input_browsers"></a> [browsers](#input\_browsers) | n/a | `list(any)` | n/a | yes |
-| <a name="input_osadminlogins"></a> [osadminlogins](#input\_osadminlogins) | n/a | `list(any)` | n/a | yes |
-| <a name="input_oslogins"></a> [oslogins](#input\_oslogins) | n/a | `list(any)` | n/a | yes |
+| <a name="input_browsers"></a> [browsers](#input\_browsers) | List of users for this role | `list(any)` | n/a | yes |
+| <a name="input_osadminlogin_condition"></a> [osadminlogin\_condition](#input\_osadminlogin\_condition) | Optional IAM condition scoping the roles/compute.osAdminLogin grant, e.g. to specific instances via a CEL expression on resource.name. Leave null (default) to grant project-wide. | <pre>object({<br/>    title       = string<br/>    description = optional(string)<br/>    expression  = string<br/>  })</pre> | `null` | no |
+| <a name="input_osadminlogins"></a> [osadminlogins](#input\_osadminlogins) | List of users for this role | `list(any)` | n/a | yes |
+| <a name="input_oslogin_condition"></a> [oslogin\_condition](#input\_oslogin\_condition) | Optional IAM condition scoping the roles/compute.osLogin grant, e.g. to specific instances via a CEL expression on resource.name. Leave null (default) to grant project-wide. | <pre>object({<br/>    title       = string<br/>    description = optional(string)<br/>    expression  = string<br/>  })</pre> | `null` | no |
+| <a name="input_oslogins"></a> [oslogins](#input\_oslogins) | List of users for this role | `list(any)` | n/a | yes |
 | <a name="input_project"></a> [project](#input\_project) | The GCP project to run against | `string` | n/a | yes |
-| <a name="input_region"></a> [region](#input\_region) | GCP region | `string` | n/a | yes |
-| <a name="input_serviceAccountUsers"></a> [serviceAccountUsers](#input\_serviceAccountUsers) | n/a | `list(any)` | n/a | yes |
-| <a name="input_storageadmins"></a> [storageadmins](#input\_storageadmins) | n/a | `list(any)` | n/a | yes |
-| <a name="input_viewers"></a> [viewers](#input\_viewers) | n/a | `list(any)` | n/a | yes |
+| <a name="input_service_account_account_id"></a> [service\_account\_account\_id](#input\_service\_account\_account\_id) | account\_id (the local part of the email, e.g. "ci-runner") for the service account that roles/iam.serviceAccountUser is scoped to | `string` | n/a | yes |
+| <a name="input_service_account_users"></a> [service\_account\_users](#input\_service\_account\_users) | List of users for this role | `list(any)` | n/a | yes |
+| <a name="input_storageadmins"></a> [storageadmins](#input\_storageadmins) | List of users for this role | `list(any)` | n/a | yes |
+| <a name="input_viewers"></a> [viewers](#input\_viewers) | List of users for this role | `list(any)` | n/a | yes |
 
 ## Outputs
 
 | Name | Description |
 | ---- | ----------- |
-| <a name="output_included_permissions"></a> [included\_permissions](#output\_included\_permissions) | n/a |
-| <a name="output_stage"></a> [stage](#output\_stage) | n/a |
-| <a name="output_title"></a> [title](#output\_title) | n/a |
+| <a name="output_included_permissions"></a> [included\_permissions](#output\_included\_permissions) | Include permissions |
+| <a name="output_stage"></a> [stage](#output\_stage) | Stage of the role |
+| <a name="output_title"></a> [title](#output\_title) | Role Title |
 <!-- END OF PRE-COMMIT-TERRAFORM DOCS HOOK -->
 
 ## Role and Permissions
@@ -60,15 +63,34 @@ No modules.
 The Terraform resource required is:
 
 ```golang
-
+# apply role
 resource "google_project_iam_custom_role" "terraform_pike" {
   project     = "pike-477416"
   role_id     = "terraform_pike"
   title       = "terraform_pike"
   description = "A user with least privileges"
   permissions = [
+    "iam.serviceAccounts.create",
+    "iam.serviceAccounts.delete",
+    "iam.serviceAccounts.get",
+    "iam.serviceAccounts.getIamPolicy",
+    "iam.serviceAccounts.setIamPolicy",
+    "iam.serviceAccounts.update",
     "resourcemanager.projects.getIamPolicy",
     "resourcemanager.projects.setIamPolicy"
+  ]
+}
+
+# plan role
+resource "google_project_iam_custom_role" "terraform_pike_plan" {
+  project     = "pike-477416"
+  role_id     = "terraform_pike_plan"
+  title       = "terraform_pike_plan"
+  description = "A user with least privileges"
+  permissions = [
+    "iam.serviceAccounts.get",
+    "iam.serviceAccounts.getIamPolicy",
+    "resourcemanager.projects.getIamPolicy"
   ]
 }
 

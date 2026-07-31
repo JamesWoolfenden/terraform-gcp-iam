@@ -1,0 +1,59 @@
+id: HLD_GCP_449
+name: Project-level compute OS Login admin/login roles should be scoped with an IAM condition
+principle: identity-and-access
+severity: HIGH
+rationale: |
+  Granting roles/compute.osAdminLogin or roles/compute.osLogin in a project-level
+  IAM binding or member gives every listed principal SSH access to every Compute
+  Engine instance in the project that has OS Login enabled, not just an intended
+  subset. For roles/compute.osAdminLogin this includes sudo/root-equivalent
+  privileges. Without an IAM Condition scoping the grant to specific instances or
+  resource tags, the blast radius of a compromised or over-broadly-populated
+  principal spans the entire compute fleet rather than the instances that
+  actually need it.
+remediation: |
+  Add a `condition` block to the grant, scoping it to specific instances or tags:
+
+  ```hcl
+  resource "google_project_iam_binding" "os_admin_login" {
+    project = var.project
+    role    = "roles/compute.osAdminLogin"
+    members = var.osadminlogins
+
+    condition {
+      title      = "scoped-to-bastion-hosts"
+      expression = "resource.name.startsWith(\"projects/_/instances/bastion-\")"
+    }
+  }
+  ```
+
+  or restructure the grant so it only targets the intended instances.
+resources:
+  google_project_iam_binding:
+    all:
+      - if_equals:
+          path: role
+          value: roles/compute.osAdminLogin
+          then:
+            path: condition
+            not_null: true
+      - if_equals:
+          path: role
+          value: roles/compute.osLogin
+          then:
+            path: condition
+            not_null: true
+  google_project_iam_member:
+    all:
+      - if_equals:
+          path: role
+          value: roles/compute.osAdminLogin
+          then:
+            path: condition
+            not_null: true
+      - if_equals:
+          path: role
+          value: roles/compute.osLogin
+          then:
+            path: condition
+            not_null: true

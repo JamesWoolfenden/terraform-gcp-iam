@@ -1,0 +1,40 @@
+{
+  "findings": [
+    {
+      "confidence": "high",
+      "explanation": "main.tf contains only the comment `# required by Hashicorp` \u2014 there is no terraform block anywhere in the root module, so no provider source or version constraint is declared. Only example/examplea/terraform.tf (a consumer, not the module itself) pins `hashicorp/google` at exact version 7.30.0. Because the module itself has zero `terraform`/`provider_requirement` resource instances, holden's deterministic checks that would normally catch this (HLD_TF_054 required_providers must be declared, HLD_TF_002 provider version must be pinned, HLD_TF_044 google provider must be >= 4.0, HLD_TF_042 required_version must be >= 1.5) cannot evaluate at all \u2014 they need an existing block to attach a Pass/Fail to, and there isn't one, so the scan is silently Unknown rather than Fail on this exact gap. This also matters concretely now: the osadminlogin_condition/oslogin_condition variables added this session use `optional()` object attributes, which require Terraform >= 1.3 \u2014 a consumer on an older Terraform gets a confusing native error instead of a clear module-level version-floor message.",
+      "file": "main.tf",
+      "first_seen": "2026-07-31",
+      "fix": "terraform {\n  required_version = \">= 1.5, < 2.0\"\n\n  required_providers {\n    google = {\n      source  = \"hashicorp/google\"\n      version = \"~> 7.0\"\n    }\n  }\n}\n",
+      "fixable": true,
+      "id": "HOLDEN_BP_001",
+      "last_seen": "2026-07-31",
+      "line": 1,
+      "principle": "repeatability",
+      "remediation": "Add a terraform block to main.tf declaring required_version and required_providers, matching holden's own pinning conventions (pessimistic ~> constraint, not bare >=):\n\nterraform {\n  required_version = \">= 1.5, < 2.0\"\n\n  required_providers {\n    google = {\n      source  = \"hashicorp/google\"\n      version = \"~> 7.0\"\n    }\n  }\n}",
+      "resource": "terraform",
+      "severity": "LOW",
+      "status": "open",
+      "title": "Root module declares no `terraform`/`required_providers` block at all"
+    },
+    {
+      "confidence": "high",
+      "explanation": "Every other multi-word resource label in this repo uses snake_case (compute_os_admin_login, compute_os_login, service_account_users) \u2014 visible in git status as an active rename-to-snake_case cleanup already in progress this session (google_project_iam_binding.Compute-OS-Admin-Login.tf -> compute_os_admin_login.tf, serviceAccountUsers.tf -> service_account_users.tf). `storageadmin` (storage_admin) is the one remaining compound label that wasn't touched. This is style-only, but stands out precisely because of the in-progress convention migration.",
+      "file": "google_project_iam_binding.storageadmin.tf",
+      "first_seen": "2026-07-31",
+      "fixable": false,
+      "id": "HOLDEN_BP_002",
+      "last_seen": "2026-07-31",
+      "line": 2,
+      "principle": "maintainability",
+      "remediation": "Rename the resource label from `storageadmin` to `storage_admin` (and the file to google_project_iam_binding.storage_admin.tf) for consistency. Since this is a published, reusable module, renaming changes the resource's state address for any existing consumer \u2014 pair the rename with a `moved` block (`moved { from = google_project_iam_binding.storageadmin; to = google_project_iam_binding.storage_admin }`) so `terraform plan` shows no destroy/recreate for downstream callers on Terraform >= 1.1.",
+      "resource": "google_project_iam_binding.storageadmin",
+      "severity": "INFO",
+      "status": "open",
+      "title": "`storageadmin` is the only compound-word IAM binding resource label without a separating underscore"
+    }
+  ],
+  "scan_date": "2026-07-31T00:00:00Z",
+  "scan_path": ".",
+  "suggested_policies": []
+}

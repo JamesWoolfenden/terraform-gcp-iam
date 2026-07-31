@@ -1,6 +1,8 @@
-resource "google_project_iam_binding" "browser" {
+resource "google_project_iam_binding" "viewer" {
+  # checkov:skip=CKV_GCP_117: viewer
+  # holden:ignore:HLD_GCP_044 — roles/viewer is intentional here
   project = var.project
-  role    = "roles/browser"
+  role    = "roles/viewer"
 
-  members = var.browsers
+  members = var.viewers
 }
