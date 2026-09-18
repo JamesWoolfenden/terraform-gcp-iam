@@ -23,7 +23,7 @@ repos:
         exclude_types: [python, javascript, dtd, markdown, makefile, xml]
         exclude: binary|\.bin$
   - repo: https://github.com/jameswoolfenden/pre-commit-shell
-    rev: 062f0b028ae65827e04f91c1e6738cfcbe9b337f # v1.0.6
+    rev: cb16822cc2c347707ea076fd4ede0d483fbbab47 # v1.0.7
     hooks:
       - id: shell-lint
         exclude: template|\.template$
@@ -42,11 +42,11 @@ repos:
     hooks:
       - id: holden
         name: holden
-        description: Scan Terraform (and CI/CD config) for policy violations
+        description: Scan Terraform for policy violations (locally-installed CLI)
         language: system
-        entry: holden scan .
+        entry: holden scan
         pass_filenames: false
-        types: [ terraform ]
+        types: [terraform]
         # pre-push, not pre-commit: a system hook resolves holden from $PATH,
         # and no CI runner has it. CI invokes `pre-commit run --all-files`,
         # whose default stage is pre-commit, so anything on that stage runs
@@ -66,7 +66,7 @@ repos:
     hooks:
       - id: actionlint
   - repo: https://github.com/jameswoolfenden/ghat
-    rev: 08381491f793709efce1b6cdc117001429444901 # v0.1.50
+    rev: 18bffde9fbbd242d04da9a640dcc510bfdfff41f # v0.1.51
     hooks:
       - id: ghat-go
       - id: ghat-go-sift

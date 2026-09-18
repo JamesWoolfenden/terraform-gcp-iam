@@ -31,6 +31,7 @@ No modules.
 | [google_project_iam_binding.viewer](https://registry.terraform.io/providers/hashicorp/google/latest/docs/resources/project_iam_binding) | resource |
 | [google_service_account.service_account_users](https://registry.terraform.io/providers/hashicorp/google/latest/docs/resources/service_account) | resource |
 | [google_service_account_iam_binding.service_account_users](https://registry.terraform.io/providers/hashicorp/google/latest/docs/resources/service_account_iam_binding) | resource |
+| [google_service_account_key.break_glass](https://registry.terraform.io/providers/hashicorp/google/latest/docs/resources/service_account_key) | resource |
 | [google_iam_role.roleinfo](https://registry.terraform.io/providers/hashicorp/google/latest/docs/data-sources/iam_role) | data source |
 
 ## Inputs
@@ -38,6 +39,7 @@ No modules.
 | Name | Description | Type | Default | Required |
 | ---- | ----------- | ---- | ------- | :------: |
 | <a name="input_browsers"></a> [browsers](#input\_browsers) | List of users for this role | `list(any)` | n/a | yes |
+| <a name="input_enable_break_glass_access"></a> [enable\_break\_glass\_access](#input\_enable\_break\_glass\_access) | Whether to mint a user-managed service account key. Leave false unless a system genuinely cannot use Workload Identity Federation, the key lands in Terraform state | `bool` | `false` | no |
 | <a name="input_osadminlogin_condition"></a> [osadminlogin\_condition](#input\_osadminlogin\_condition) | Optional IAM condition scoping the roles/compute.osAdminLogin grant, e.g. to specific instances via a CEL expression on resource.name. Leave null (default) to grant project-wide. | <pre>object({<br/>    title       = string<br/>    description = optional(string)<br/>    expression  = string<br/>  })</pre> | `null` | no |
 | <a name="input_osadminlogins"></a> [osadminlogins](#input\_osadminlogins) | List of users for this role | `list(any)` | n/a | yes |
 | <a name="input_oslogin_condition"></a> [oslogin\_condition](#input\_oslogin\_condition) | Optional IAM condition scoping the roles/compute.osLogin grant, e.g. to specific instances via a CEL expression on resource.name. Leave null (default) to grant project-wide. | <pre>object({<br/>    title       = string<br/>    description = optional(string)<br/>    expression  = string<br/>  })</pre> | `null` | no |
@@ -52,6 +54,7 @@ No modules.
 
 | Name | Description |
 | ---- | ----------- |
+| <a name="output_break_glass_private_key"></a> [break\_glass\_private\_key](#output\_break\_glass\_private\_key) | Base64 encoded private key of the break-glass service account key, null when var.enable\_break\_glass\_access is false |
 | <a name="output_included_permissions"></a> [included\_permissions](#output\_included\_permissions) | Include permissions |
 | <a name="output_stage"></a> [stage](#output\_stage) | Stage of the role |
 | <a name="output_title"></a> [title](#output\_title) | Role Title |
@@ -70,6 +73,8 @@ resource "google_project_iam_custom_role" "terraform_pike" {
   title       = "terraform_pike"
   description = "A user with least privileges"
   permissions = [
+    "iam.serviceAccountKeys.create",
+    "iam.serviceAccountKeys.get",
     "iam.serviceAccounts.create",
     "iam.serviceAccounts.delete",
     "iam.serviceAccounts.get",
@@ -88,6 +93,7 @@ resource "google_project_iam_custom_role" "terraform_pike_plan" {
   title       = "terraform_pike_plan"
   description = "A user with least privileges"
   permissions = [
+    "iam.serviceAccountKeys.get",
     "iam.serviceAccounts.get",
     "iam.serviceAccounts.getIamPolicy",
     "resourcemanager.projects.getIamPolicy"

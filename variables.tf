@@ -110,3 +110,9 @@ variable "service_account_account_id" {
     error_message = "service_account_account_id must be 6-30 characters, lowercase letters, digits and hyphens, starting with a letter."
   }
 }
+
+variable "enable_break_glass_access" {
+  type        = bool
+  description = "Whether to mint a user-managed service account key. Leave false unless a system genuinely cannot use Workload Identity Federation, the key lands in Terraform state"
+  default     = false
+}
